@@ -1,0 +1,39 @@
+<?php
+
+return [
+
+    'paths' => [
+        'api/*',
+        'login',
+        'logout',
+        'register',
+        'user/password',
+        'forgot-password',
+        'reset-password',
+        'sanctum/csrf-cookie',
+        'user/profile-information',
+        'email/verification-notification',
+    ],
+
+    'allowed_methods' => ['*'],
+
+    'allowed_origins' => [
+        'http://localhost',
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://hris.test',
+        'http://hris.test:3000',
+        'http://hris.test:5173',
+    ],
+
+    'allowed_origins_patterns' => [],
+
+    'allowed_headers' => ['*'],
+
+    'exposed_headers' => [],
+
+    'max_age' => 0,
+
+    'supports_credentials' => true,
+
+];
