@@ -119,8 +119,8 @@ The project ships with the most useful components that are required for one appl
 Note: Please always look in the components, this table does not show everything.
 
 From here, you are on your own. Develop new pages, models, components, use professional IDE for development to improve your efficiency.
-
-<p><img width="100%" src="https://user-images.githubusercontent.com/5760249/210167222-e04312ac-46ef-4dcd-a4d5-00c3a207bf32.gif"/></p>
+<!-- 
+<!-- <p><img width="100%" src="https://user-images.githubusercontent.com/5760249/210167222-e04312ac-46ef-4dcd-a4d5-00c3a207bf32.gif"/></p>
 
 ### ➡️ CORS
 
@@ -167,4 +167,4 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Laravel Vue Starter. If not, see <https://www.gnu.org/licenses/>.
-```
+``` -->
