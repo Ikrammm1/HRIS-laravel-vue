@@ -22,20 +22,29 @@ export const useAuthStore = defineStore("auth", {
          * - Set axios Authorization header
          * - Fetch current user if token exists
          */
-        async initAuth() {
-            const token = window.localStorage.getItem('api_token');
-            if (token) {
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-                try {
-                    await this.getCurrentUser();
-                } catch (error) {
-                    // Token invalid, clear it
-                    window.localStorage.removeItem('api_token');
-                    delete axios.defaults.headers.common['Authorization'];
-                    this.user = null;
-                }
-            }
-        },
+        // BAGIAN 2: useAuthStore -> actions -> initAuth
+async initAuth() {
+    const token = window.localStorage.getItem('api_token');
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+        try {
+            await this.getCurrentUser(); 
+            
+        } catch (error) {
+            // Ini menangkap error 401 yang dilempar dari getCurrentUser.
+            
+            // 🎯 Pastikan kita melakukan cleanup:
+            window.localStorage.removeItem('api_token');
+            delete axios.defaults.headers.common['Authorization'];
+            this.user = null;
+            
+            // PENTING: JANGAN ada 'throw error' atau 'return Promise.reject(error)' di sini.
+            // Dengan membiarkan fungsi berakhir, Promise dari initAuth akan secara implisit
+            // menjadi resolved, dan Router Guard tidak akan melihat kegagalan.
+        }
+    }
+    // Jika tidak ada token, atau jika token dibersihkan, Promise akan resolved secara normal.
+},
         async login(payload) {
             const authService = new AuthService();
             const alertStore = useAlertStore();
@@ -67,22 +76,31 @@ export const useAuthStore = defineStore("auth", {
                 alertStore.error(getResponseError(error));
             }
         },
-        async getCurrentUser() {
-            this.loading = true;
-            const authService = new AuthService();
-            try {
-                const response = await authService.getCurrentUser();
-                this.user = response.data.data;
-                // Persist user (and keep api_token separate)
-                this.setBrowserData();
-                this.loading = false
-            } catch (error) {
-                this.loading = false
-                this.user = null;
-                this.error = getResponseError(error);
-            }
-            return this.user;
-        },
+        // BAGIAN 1: useAuthStore -> actions -> getCurrentUser
+async getCurrentUser() {
+    this.loading = true;
+    const authService = new AuthService();
+    
+    try {
+        const response = await authService.getCurrentUser();
+        this.user = response.data.data;
+        this.setBrowserData();
+    } catch (error) {
+        // Jika 401, jangan tampilkan ke UI (tidak atur this.error), tapi re-throw.
+        if (error.response && error.response.status === 401) {
+            this.user = null;
+            throw error; // Lempar kembali ke initAuth
+        }
+        
+        // Untuk error lain (500, jaringan, dll.)
+        this.user = null;
+        this.error = getResponseError(error); 
+        throw error; // Lempar error lain juga
+        
+    } finally {
+        this.loading = false;
+    }
+},
         updateAvatar(id, payload) {
             const alertStore = useAlertStore();
             const userService = new UserService();
