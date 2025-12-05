@@ -15,7 +15,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "silber/bouncer": "^1.0",
-        "spatie/laravel-medialibrary": "^11.3"
+        "spatie/laravel-medialibrary": "^11.3",
+        "tymon/jwt-auth": "^2.2"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.0",
@@ -71,6 +72,6 @@
             "pestphp/pest-plugin": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
