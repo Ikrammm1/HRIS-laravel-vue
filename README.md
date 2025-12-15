@@ -146,6 +146,12 @@ From here, you are on your own. Develop new pages, models, components, use profe
 
 Pull requests are welcome, feel free to contribute to this project.
 
+## login page
+<img width="1917" height="916" alt="image" src="https://github.com/user-attachments/assets/dd5f114a-00bc-4b3c-add7-562e39b422f7" />
+
+## Dummy dashboard page
+<img width="1907" height="910" alt="image" src="https://github.com/user-attachments/assets/c0d36e46-3f21-4a23-9e40-0f77671e9e95" />
+
 
 <!-- 
 <!-- <p><img width="100%" src="https://user-images.githubusercontent.com/5760249/210167222-e04312ac-46ef-4dcd-a4d5-00c3a207bf32.gif"/></p>
