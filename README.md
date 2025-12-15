@@ -18,20 +18,18 @@ The project is built with the following components:
 - Laravel Fortify
 - Tailwind
 - ForkAwesome
-- Media Library (by Spatie)
-- Bouncer (by JosephSilber)
 
 ## ⚡️ How to install
 
 Installation is simple. Just like your ordinary Laravel app.
 
 1. `git clone`
-2. `cd laravel-vue-starter`
+2. `cd HRIS-laravel-vue`
 3. `composer install`
 4. `cp .env.example .env`
 5. `php artisan key:generate`   
 6. `npm install`
-7. `npm run watch` (or if production `npm run build`)
+7. `npm run dev` (or if production `npm run build`)
 
 ## ⚡️ How it works
 
@@ -44,11 +42,10 @@ module.exports = {
     // ...
     theme: {
         extend: {
-            colors: {
-                theme: colors.teal,
-                danger: colors.red
-            }
-        }
+            fontFamily: {
+                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            },
+        },
     },
     //...
 };
@@ -61,14 +58,10 @@ The project ships with complete authentication boilerplate including:
 - Register
 - Forget Password
 - Reset Password
+- Dashboard
+- Menu Management
+- User Management
 
-### ➡️ Authorization
-
-The project is configured to use [Bouncer](https://github.com/JosephSilber/bouncer) package for managing authorization across your routes. Authorization is important security subject, so please consult bouncer's package documentation.
-
-### ➡️ Localization / i18n
-
-The project supports localization / i18n, to translate the front-end use `lang/{code}/frontend.php` file.
 
 ### ➡️ Users CRUD 
 
@@ -79,46 +72,81 @@ For your convenience the project comes with complete `users` crud that includes 
 
 ### ➡️ Structure
 
-The front-end code is located in `resources/app`. The code is organized in different directories to make things more readable.
+The front-end code is located in `resources/js`. The code is organized in different directories to make things more readable.
 
 | Directory    | Description                           |
 |--------------|---------------------------------------|
-| views        | The home of views                     |
-| + pages      | The home of the pages                 |
+| Components   | The home of the reusable components   |
 | + icons      | The home of the icons                 |
-| + layouts    | The home of the global layouts        |
-| + components | The home of the reusable components   |
-| helpers      | The home of the helper utilites       |
-| plugins      | The home of the plugins configuration |
+| + widgets    | The home of the widget components     |
+| Layouts      | The home of the global layouts        |
+| Pages        | The home of the pages                 |
+| + Auth       | Authentication pages                  |
+| + Menu       | Menu pages                            |
+| + Profile    | Profile pages                         |
+| + User       | User pages                            |
+| data         | The home of static data/constants     |
 | router       | The home of the router configuration  |
-| services     | The home of the HTTP services         |
-| stores       | The home of the Pinia stores          |
-| stub         | The home of the static constants      |
-
+| store        | The home of the Pinia stores          |
+| + modules    | Vuex/Pinia store modules              |
 ### ➡️ Components
 
-The project ships with the most useful components that are required for one application (no bullshit), including:
+The project ships with the most useful components that are required for one application, organized in a clean structure:
 
-| Name      | Description                                                | Parameters                                                                                                                                                     | Events                                   | Location               |
-|-----------|------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------|------------------------|
-| Page      | The main page wrapper                                      | title, breadcrumbs (array), actions (array of actions on top), is-loading                                                                                      | n/a                                      | views/layouts          |
-| Panel     | Panel wrapper for displaying panels into the pages         | title, is-loading, body-padding                                                                                                                                | n/a                                      | views/components       |
-| Modal     | Modal wrapper for creating modals                          | is-showing, is-loading, show-close                                                                                                                             | @close                                   | views/components       |
-| Form      | Form wrapper                                               | title, is-loading                                                                                                                                              | n/a                                      | views/components       |
-| Table     | A custom table with sorting and pagination support         | headers (array), records (array), actions (array of row actions), sorting (object of keys with true/false), pagination: (object of Laravel pagination data)    | @page-changed, @action, $sort            | views/components       |
-| Alert     | Alert component that pulls alrts from AlertStore           | n/a                                                                                                                                                            | n/a                                      | views/components       |
-| Badge     | Component that displays highlighted text with background   | theme (success, info, warning, danger, error)                                                                                                                  | n/a                                      | views/components       |
-| TextInput | Custom text field with type={text,..., textarea} support   | name, label, v-model, type (text,...,textarea, etc), show-label, required, disabled, placeholder                                                               | default                                  | views/components/input |
-| FileInput | File input with custom button and multiple choices support | name, label, v-model, show-label, required, disabled, placeholder, multiple, accept                                                                            | default + @click, @error, @input, @clear | views/components/input |
-| Dropdown  | Dropdown field with server side support                    | name, label, v-model, show-label, required, disabled, placeholder, multiple, server (endpoint), server-per-page (items per page), server-search-min-characters | default                                  | views/components/input |
-| Button    | Button/Router link component                               | label, icon, theme (success, info, warning, danger, error), disabled, to (:to is router url, when specified the button is rendered as router-link)             | default                                  | views/components/input |
-| Spinner   | Spinner icon used mostly for loading                       | text, text-new-line (whether to break the text under the spinner)                                                                                              | n/a                                      | views/components/icons |
-| Icon      | Icon wrapper, currently uses fork awesome                  | name (the icon name without the fa- part)                                                                                                                      | n/a                                      | views/components/icons |
-| Avatar    | Default Avatar icon                                        | n/a                                                                                                                                                            | n/a                                      | views/components/icons |
+| Name                  | Description                                                | Location                    |
+|-----------------------|------------------------------------------------------------|-----------------------------|
+| ApplicationLogo       | Application logo component                                 | js/Components               |
+| Checkbox              | Custom checkbox component                                  | js/Components               |
+| ConfirmDialog         | Confirmation dialog modal                                  | js/Components               |
+| DangerButton          | Danger-themed button component                             | js/Components               |
+| Dropdown              | Dropdown menu component                                    | js/Components               |
+| DropdownLink          | Dropdown menu link item                                    | js/Components               |
+| InputError            | Input error message display                                | js/Components               |
+| InputLabel            | Input label component                                      | js/Components               |
+| Modal                 | Modal wrapper for creating modals                          | js/Components               |
+| NavLink               | Navigation link component                                  | js/Components               |
+| PrimaryButton         | Primary-themed button component                            | js/Components               |
+| ResponsiveNavLink     | Responsive navigation link                                 | js/Components               |
+| SecondaryButton       | Secondary-themed button component                          | js/Components               |
+| TextInput             | Custom text input field                                    | js/Components               |
+| **Icons**             | Icon components collection                                 | js/Components/icons         |
+| **Widgets**           | Reusable widget components                                 | js/Components/widgets       |
 
-Note: Please always look in the components, this table does not show everything.
+#### Layouts
+
+| Name                    | Description                              | Location                    |
+|-------------------------|------------------------------------------|-----------------------------|
+| AuthenticatedLayout     | Layout for authenticated pages           | js/Layouts                  |
+| AuthenticatedLayout copy| Copy/variant of authenticated layout     | js/Layouts                  |
+| GuestLayout             | Layout for guest/public pages            | js/Layouts                  |
+| footer                  | Footer component                         | js/Layouts                  |
+| NavlinkNew              | New navigation link component            | js/Layouts                  |
+| sidebar                 | Sidebar navigation component             | js/Layouts                  |
+| topbar                  | Top navigation bar component             | js/Layouts                  |
+
+#### Pages
+
+Pages are organized by feature area:
+
+| Directory  | Description                              |
+|------------|------------------------------------------|
+| Auth       | Authentication pages (login, register)   |
+| Menu       | Menu management pages                    |
+| Profile    | User profile pages                       |
+| User       | User management pages                    |
+| Dashboard  | Dashboard views                          |
+| Welcome    | Welcome/landing page                     |
+
+Note: Please always look in the components directory for the most up-to-date list. Each component may have additional props, events, and slots not listed here.
 
 From here, you are on your own. Develop new pages, models, components, use professional IDE for development to improve your efficiency.
+
+
+## ⚡️ Contributions
+
+Pull requests are welcome, feel free to contribute to this project.
+
+
 <!-- 
 <!-- <p><img width="100%" src="https://user-images.githubusercontent.com/5760249/210167222-e04312ac-46ef-4dcd-a4d5-00c3a207bf32.gif"/></p>
 
@@ -144,9 +172,6 @@ SANCTUM_STATEFUL_DOMAINS=localhost:8000
 SESSION_DOMAIN=localhost
 ```
 
-## ⚡️ Contributions
-
-Pull requests are welcome, feel free to contribute to this project.
 
 ## ⚡️ License
 
