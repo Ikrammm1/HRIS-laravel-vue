@@ -109,7 +109,8 @@
         </button>
 
         <button
-          class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-500"
+          :disabled="!isFormValid"
+          class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-500 disabled:opacity-50"
           @click="submitForm"
         >
           {{ submitText }}
@@ -139,7 +140,7 @@ export default {
       description: "",
       url: "",
       level: 1,
-      parent_id: null,
+      parent_id: '',
       levelOptions: [
         { value: 1, text: "Header" },
         { value: 2, text: "Parent" },
@@ -186,6 +187,24 @@ export default {
       console.log(this.$store.state.menu.menus.filter(menu => ((this.level && this.level>1)? menu.level == this.level - 1 :  menu.level != 3)));
       return this.$store.state.menu.menus.filter(menu => ((this.level && this.level>1)? menu.level == this.level - 1 :  menu.level != 3));
     },
+    isFormValid() {
+        if (this.action === 'update') {
+          return (
+            this.menu_name !== '' &&
+            this.url !== '' &&
+            this.level !== '' &&
+            this.icon !== ''
+          )
+        }
+
+        // add
+        return (
+            this.menu_name !== '' &&
+            this.url !== '' &&
+            this.level !== '' &&
+            this.icon !== ''
+        )
+      }
   },
   methods: {
     closeSidebar() {

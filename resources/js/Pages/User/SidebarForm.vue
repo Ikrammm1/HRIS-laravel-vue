@@ -28,46 +28,64 @@
       <!-- Content / Form -->
       <div class="p-4 overflow-y-auto h-[calc(100%-120px)]">
         <form @submit.prevent="submitForm">
-          <div class="mb-4">
+            <div class="mb-4">
             <label class="block font-medium">User Name</label>
             <input
               type="text"
               v-model="username"
-              class="w-full mt-1  rounded p-2"
+              @blur="touched.username = true"
+              class="w-full mt-1 rounded p-2 border"
               placeholder="User name"
-            >
+            />
+            <p v-if="touched.username && errors.username" class="text-red-500 text-sm mt-1">
+              {{ errors.username }}
+            </p>
           </div>
-
 
           <div class="mb-4">
             <label class="block font-medium">Email</label>
             <input
               type="email"
               v-model="email"
-              class="w-full mt-1 rounded p-2"
+              @blur="touched.email = true"
+              class="w-full mt-1 rounded p-2 border"
               placeholder="example@mail.com"
-            >
+            />
+            <p v-if="touched.email && errors.email" class="text-red-500 text-sm mt-1">
+              {{ errors.email }}
+            </p>
           </div>
+
           <div class="mb-4">
             <label class="block font-medium">Password</label>
             <input
               type="password"
               v-model="pass"
-              class="w-full mt-1  rounded p-2"
+              @blur="touched.pass = true"
+              class="w-full mt-1 rounded p-2 border"
               placeholder="Password"
-            >
+            />
+            <p v-if="touched.pass && errors.pass" class="text-red-500 text-sm mt-1">
+              {{ errors.pass }}
+            </p>
           </div>
+
           <div class="mb-4">
             <label class="block font-medium">Confirm Password</label>
             <input
               type="password"
               v-model="cPass"
-              class="w-full mt-1  rounded p-2"
+              @blur="touched.cPass = true"
+              class="w-full mt-1 rounded p-2 border"
               placeholder="Confirm password"
-            >
+            />
+            <p v-if="touched.cPass && errors.cPass" class="text-red-500 text-sm mt-1">
+              {{ errors.cPass }}
+            </p>
           </div>
 
         </form>
+
       </div>
 
       <!-- Footer -->
@@ -80,8 +98,9 @@
         </button>
 
         <button
+          type="submit"
           :disabled="!isFormValid"
-          class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-500"
+          class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-500 disabled:opacity-50"
           @click="submitForm"
         >
           {{ submitText }}
@@ -111,9 +130,28 @@ export default {
       email: "",
       pass: "",
       cPass: '',
+      errors: {},
+      touched: {
+        username: false,
+        email: false,
+        pass: false,
+        cPass: false,
+      }
     };
   },
   watch: {
+    username() {
+      if (this.touched.username) this.validateForm()
+    },
+    email() {
+      if (this.touched.email) this.validateForm()
+    },
+    pass() {
+      if (this.touched.pass) this.validateForm()
+    },
+    cPass() {
+      if (this.touched.cPass) this.validateForm()
+    },
     data: {
         immediate: true,
         handler(val) {
@@ -148,7 +186,8 @@ export default {
           return (
             this.username !== '' &&
             this.email !== '' &&
-            (this.pass === '' || this.pass === this.cPass)
+            (this.pass === '' || this.pass === this.cPass) &&
+            Object.keys(this.errors).length === 0
           )
         }
 
@@ -157,14 +196,51 @@ export default {
           this.username !== '' &&
           this.email !== '' &&
           this.pass !== '' &&
-          this.pass === this.cPass
+          this.pass === this.cPass &&
+          Object.keys(this.errors).length === 0
         )
       }
 
 
   },
   methods: {
-   
+   validateForm() {
+      this.errors = {}
+
+      // Username
+      if (!this.username) {
+        this.errors.username = 'Username wajib diisi'
+      }
+
+      // Email
+      if (!this.email) {
+        this.errors.email = 'Email wajib diisi'
+      } else if (!this.isValidEmail(this.email)) {
+        this.errors.email = 'Format email tidak valid'
+      }
+
+      // Password
+      if (!this.pass) {
+        if(this.action == 'Add'){
+          this.errors.pass = 'Password wajib diisi'
+        }
+      } else if (this.pass.length < 6) {
+        this.errors.pass = 'Password minimal 6 karakter'
+      }
+
+      // Confirm Password
+      if (!this.cPass) {
+        if(this.action == 'Add'){
+          this.errors.cPass = 'Confirm password wajib diisi'
+        }
+      } else if (this.cPass !== this.pass) {
+        this.errors.cPass = 'Password tidak sama'
+      }
+    },
+
+    isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    },
     closeSidebar() {
       this.$emit("close");
       this.resetForm()
@@ -175,16 +251,24 @@ export default {
       this.pass = "";
       this.cPass = '';
       this.id = null;
-      
+      this.errors = {};
       
     },
 
     submitForm() {
+     Object.keys(this.touched).forEach(key => {
+        this.touched[key] = true
+      })
+
+      this.validateForm()
+
+      if (Object.keys(this.errors).length > 0) return
+
       const formData = new FormData()
       const user = JSON.parse(localStorage.getItem('authUser'))
 
       if (this.id) {
-        formData.append('id', this.id) // update saja
+        formData.append('id', this.id) 
       }
       formData.append('username', this.username)
       formData.append('email', this.email)

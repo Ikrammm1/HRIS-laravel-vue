@@ -33,7 +33,7 @@
                         >
                             <!-- Vue 3 slot syntax -->
                             <template #table-row="props">
-                              
+                                
                                 <span
                                     v-if="props.column.field === 'action'"
                                     class="flex items-center gap-2"
@@ -52,6 +52,20 @@
                                         <Icon name="trash" class="text-xs"  />
                                     </button>
                                 </span>
+
+                               <span
+                                    v-else-if="props.column.field === 'level'"
+                                    class="flex items-center gap-2"
+                                    >
+                                    {{
+                                        props.row.level == 1
+                                        ? 'Header'
+                                        : props.row.level == 2
+                                            ? 'Parent'
+                                            : 'Children'
+                                    }}
+                                </span>
+
 
 
                                 <span v-else>
