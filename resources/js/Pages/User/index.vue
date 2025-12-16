@@ -168,7 +168,7 @@ export default {
             formData.append('id', id)
             this.$store.commit("SET_LOADING", true)
 
-            this.$store.dispatch("menu/delete", { formData, id }).then(() => {
+            this.$store.dispatch("users/delete", { formData, id }).then(() => {
             toast.success(
                 `Data has been deleted`,
                 {

@@ -12,10 +12,16 @@ const mutations = {
     ADD_USER(state, data){
         state.datas.unshift(data);
     },
-    UPDATE_USERS(state,data){
-        const index = state.datas.find(item => item.id == data.id)
+    UPDATE_USER(state,data){
+        const index = state.datas.findIndex(item => item.id === data.id);
+        if (index !== -1) {
+            state.datas.splice(index, 1, data);
+        }
+    },
+    DELETE(state, id){
+        const index = state.datas.findIndex(item => item.id === id);
         if(index != -1){
-            state.datas.splice(index, 1, data)
+            state.datas.splice(index, 1);
         }
     }
 }
@@ -42,6 +48,24 @@ const actions = {
                     commit("ADD_USER", response.data.data); // Pastikan struktur data benar
                 }   
                 resolve(response.data.data);
+            })
+            .catch(error => {
+                reject(error);
+            });
+        })
+    },
+
+    async delete({commit}, data){
+        return new Promise((resolve, reject) => {
+        axios.post("/api/users/delete", data.formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(response => {       
+                commit("DELETE", data.id);
+                resolve(response.data.message);
+
             })
             .catch(error => {
                 reject(error);
