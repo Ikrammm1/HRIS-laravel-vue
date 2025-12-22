@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 import AuthModule from './modules/auth';
 import MenuModule from './modules/menu';
 import UserModule from './modules/users';
+import Autherization from './modules/authorizationGroup';
 
 export default createStore({
     state: {
@@ -21,5 +22,6 @@ export default createStore({
         auth: AuthModule,
         menu: MenuModule,
         users: UserModule,
+        authorizationGroup: Autherization,
     },
 });

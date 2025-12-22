@@ -22,6 +22,7 @@
                             </div>
 
                         <vue-good-table
+                            :line-numbers="true"
                             :columns="columns"
                             :rows="menuList"
                             :search-options="{ enabled: false }"

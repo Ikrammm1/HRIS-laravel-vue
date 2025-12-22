@@ -135,6 +135,11 @@ class MenuController extends Controller
                         'to' => '/settings/user',
                         'requiresAbility' => 'view user management',
                     ],
+                    [
+                        'name' => 'Authorization Group',
+                        'to' => '/settings/autherization-group',
+                        'requiresAbility' => 'view authorization group',
+                    ],
                 ]
             ],
             

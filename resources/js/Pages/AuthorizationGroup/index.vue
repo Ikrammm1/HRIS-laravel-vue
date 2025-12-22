@@ -2,7 +2,7 @@
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Users Management
+                Menu Management
             </h2>
         </template>
 
@@ -24,7 +24,7 @@
                         <vue-good-table
                             :line-numbers="true"
                             :columns="columns"
-                            :rows="userList"
+                            :rows="menuList"
                             :search-options="{ enabled: false }"
                             :pagination-options="{
                                 enabled: true,
@@ -34,23 +34,9 @@
                         >
                             <!-- Vue 3 slot syntax -->
                             <template #table-row="props">
-                                <div
-                                    v-if="props.column.field === 'icon'"
-                                    class="flex items-center justify-center w-full h-full"
-                                >
-                                    <Icon :name="props.row.icon" class="text-md" />
-                                </div>
-                                <span v-else-if="props.column.field === 'level'">
-                                    <span v-html="props.row.level"></span>
-                                </span>
-                                <span v-else-if="props.column.field === 'score'">
-                                    {{ (props.row.score * 100).toFixed(2) }} %
-                                </span>
-                                <span v-else-if="props.column.field === 'parent_id'">
-                                    <span>{{ this.$store.state.menu.menus.find(menu => menu.id == props.row.parent_id)?.menu_name}} </span>
-                                </span>
+                                
                                 <span
-                                    v-else-if="props.column.field === 'action'"
+                                    v-if="props.column.field === 'action'"
                                     class="flex items-center gap-2"
                                 >
                                     <button
@@ -67,6 +53,25 @@
                                         <Icon name="trash" class="text-xs"  />
                                     </button>
                                 </span>
+
+                               <div
+                                    v-else-if="props.column.field == 'users'"
+                                    class="flex flex-wrap gap-2 max-w-[200px]" 
+                                >
+                                    <span v-for="value in props.row.users" :key="value.id" class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                                        {{ value.name }}
+                                    </span>
+                                </div>
+
+                                <div
+                                    v-else-if="props.column.field == 'menus'"
+                                    class="flex flex-wrap gap-2 max-w-[250px]"
+                                >
+                                    <span v-for="value in props.row.menus" :key="value.id" class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-700/10">
+                                        {{ value.menu_name }}
+                                    </span>
+                                </div>
+
 
 
                                 <span v-else>
@@ -107,6 +112,7 @@ import menu from '@/store/modules/menu';
 import SidebarForm from "./SidebarForm.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { showConfirmDialog } from '@rmsjs/vue3-dialog-tw'
 import ConfirmDialog from '../../Components/ConfirmDialog.vue'
 
 export default {
@@ -114,7 +120,7 @@ export default {
 
     data() {
         return {
-                title: "User Management",
+                title: "Authorization Group",
                 columns: [
                     {
                         label: 'Name', // Kolom untuk nama
@@ -125,13 +131,27 @@ export default {
                         },
                     },
                     {
-                        label: 'Email', // Kolom untuk deskripsi
-                        field: 'email',
+                        label: 'Description', // Kolom untuk deskripsi
+                        field: 'description',
                         sortable: false, // Deskripsi panjang mungkin tidak perlu di-sort
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter email',
+                            placeholder: 'Filter Deskripsi',
                         },
+                    },
+                    {
+                        label: 'Users', // Kolom untuk URL
+                        field: 'users',
+                        sortable: false,
+                        width: '300px',
+                       
+                    },
+                    {
+                        label: 'Menu', // Kolom untuk URL
+                        field: 'menus',
+                        sortable: false,
+                        width: '300px',
+                       
                     },
                     
                     {
@@ -143,8 +163,6 @@ export default {
                         },
                     },
                 ],
-            
-                // Contoh Data (Rows)
                 isSidebarOpen: false,
                 actionType: 'add',   // add | update
                 selectedData: null, // data row
@@ -153,8 +171,8 @@ export default {
             };
     },
     computed: {
-        userList() {
-            return this.$store.state.users.datas;
+        menuList() {
+            return this.$store.state.authorizationGroup.datas;
         },
     },
     methods: {
@@ -169,7 +187,7 @@ export default {
             formData.append('id', id)
             this.$store.commit("SET_LOADING", true)
 
-            this.$store.dispatch("users/delete", { formData, id }).then(() => {
+            this.$store.dispatch('authorizationGroup/delete', id).then(() => {
             toast.success(
                 `Data has been deleted`,
                 {
@@ -206,7 +224,9 @@ export default {
     async created() {
         this.$store.commit("SET_LOADING", true);
         try {
+            await this.$store.dispatch("authorizationGroup/list");
             await this.$store.dispatch("users/list");
+            await this.$store.dispatch("menu/menuList");
         } finally {
             this.$store.commit("SET_LOADING", false);
         }

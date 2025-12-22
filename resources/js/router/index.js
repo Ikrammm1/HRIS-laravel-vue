@@ -10,6 +10,7 @@ const Dashboard = () => import('@/Pages/Dashboard.vue');
 const Profile = () => import('@/Pages/Profile/Edit.vue');
 const Menus = () => import('@/Pages/Menu/index.vue')
 const Users = () => import('@/Pages/User/index.vue')
+const AuthGroup = () => import('@/Pages/AuthorizationGroup/index.vue')
 // const NotFound = () => import('@/NotFound.vue');
 
 const routes = [
@@ -98,6 +99,16 @@ const routes = [
         meta: {
             requiresAuth: true,
             title: 'user Management',
+            layout: 'default',
+        },
+    },
+    {
+        path: '/settings/autherization-group',
+        name: 'autherization-group',
+        component: AuthGroup ,
+        meta: {
+            requiresAuth: true,
+            title: 'Autherization Group',
             layout: 'default',
         },
     },
