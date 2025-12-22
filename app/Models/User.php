@@ -42,4 +42,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function authorizationGroups()
+    {
+        return $this->belongsToMany(
+            AuthorizationGroup::class,
+            'hris_user_auth_groups',
+            'user_id',
+            'group_id'
+        );
+    }
 }

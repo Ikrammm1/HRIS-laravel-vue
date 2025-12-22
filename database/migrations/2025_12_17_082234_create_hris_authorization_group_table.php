@@ -11,8 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hris_menus', function (Blueprint $table) {
-            $table->string('parent_id')->nullable()->after('level');
+        Schema::create('hris_authorization_group', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->string('name');
+            $table->string('description');
+            $table->string('user_id');
+
+            
         });
     }
 
@@ -21,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('hris_authorization_group');
     }
 };
