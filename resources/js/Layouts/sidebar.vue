@@ -35,98 +35,131 @@
         </div>
         <div class="mt-4 relative flex-1 ps-3">
             <ul>
-                <div v-for="item in mainMenu" :key="item.name" class="mt-2">
+                <div v-for="header in mainMenu" :key="header.name" class="mt-2">
 
-                    <!-- MENU DENGAN CHILDREN -->
-                    <li v-if="item.hasOwnProperty('children')">
-                        <button 
-                            @click.prevent="toggleSubmenu(item)" 
-                            type="button"
-                            class="transition duration-200 group w-full flex items-center p-3 text-sm font-medium rounded-lg"
-                            :class="[
-                                'relative rounded-xl transition-all overflow-hidden',
-                                isActive(item) 
-                                    ? 'bg-teal-600 text-white shadow-md before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full' 
-                                    : 'text-gray-600 hover:bg-teal-600/20 hover:text-teal-700 before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full before:opacity-0 hover:before:opacity-100'
-                            ]"
+                    <!-- HEADER BUTTON -->
+                    <li v-if="header.children.length > 0">
+                        <button
+                        @click.prevent="toggleMenu(header)"
+                        type="button"
+                        class="transition duration-200 group w-full flex items-center p-3 text-sm font-medium rounded-lg"
+                        :class="isActive(header)
+                            ? 'bg-teal-600 text-white'
+                            : 'text-gray-600 hover:bg-teal-600/20 hover:text-teal-700'"
                         >
+                        <Icon
+                            :name="header.icon"
+                            class="w-5 h-5"
+                            :class="isSidebarMinimized ? 'mx-auto' : 'mr-3'"
+                        />
 
-                            <!-- ICON UTAMA -->
-                            <Icon 
-                                :name="item.icon" 
-                                class="w-5 h-5 flex-shrink-0"
-                                :class="isSidebarMinimized ? 'mx-auto' : 'mr-3'"
+                        <template v-if="!isSidebarMinimized">
+                            <span class="flex-1 text-left">{{ header.name }}</span>
+                            <Icon
+                                :name="expandedHeader === header.name ? 'angle-up' : 'angle-down'"
+                                class="w-4 h-4"
                             />
 
-                            <!-- TEKS + PANAH -->
-                            <template v-if="!isSidebarMinimized">
-                                <span class="flex-1 text-left" v-html="item.name"></span>
-
-                                <Icon 
-                                    :name="currentExpandedMenuItem === item.name ? 'angle-up' : 'angle-down'" 
-                                    class="w-4 h-4 flex-shrink-0 self-center"
-                                />
-                            </template>
-
+                        </template>
                         </button>
 
-                        <!-- SUBMENU -->
-                        <ul 
-                            v-if="!isSidebarMinimized" 
-                            class="py-2 space-y-1 ml-4" 
-                            :class="currentExpandedMenuItem === item.name ? '' : 'hidden'"
+                        <ul
+                            v-if="!isSidebarMinimized"
+                            class="py-2 space-y-1 ml-2"
+                            :class="expandedHeader === header.name ? '' : 'hidden'"
                         >
-                            <template v-for="subitem in item.children" :key="subitem.name">
-                                <li>
+
+                            <li v-for="parent in header.children" :key="parent.name">
+
+                                <button
+                                    v-if="parent.children.length > 0"
+                                    @click.prevent="toggleSubmenu(parent)"
+                                    class="transition duration-200 group w-full flex items-center p-2 pl-2 text-sm font-medium rounded-lg"
+                                    :class="isActive(parent)
+                                        ? 'bg-teal-600 text-white'
+                                        : 'text-gray-600 hover:bg-teal-600/20 hover:text-teal-700'"
+                                    >
+                                    <Icon :name="parent.icon" class="w-4 h-4 mr-2" />
+                                    <span class="flex-1 text-left">{{ parent.name }}</span>
+                                    <Icon
+                                        :name="expandedParent === parent.name ? 'angle-up' : 'angle-down'"
+                                        class="w-3 h-3"
+                                    />
                                     
-                                    <router-link 
-                                        :to="subitem.to ? subitem.to : '#'" 
-                                        class="flex items-center p-2 pl-8 w-full text-sm font-medium rounded-lg transition-colors"
+                                </button>
+                                <router-link 
+                                    v-else
+                                        :to="parent.to ? parent.to : '#'" 
+                                        class="flex items-center p-2 text-sm font-medium rounded-lg transition-colors group"
                                         :class="[
-                                            isActive(subitem) 
-                                                ? 'bg-teal-600 text-white' 
-                                                : 'text-gray-600 hover:bg-teal-100 hover:text-teal-700'
+                                            'relative rounded-lg transition-all overflow-hidden',
+                                            isActive(parent) 
+                                                ? 'bg-teal-600 text-white shadow-md before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full' 
+                                                : 'text-gray-600 hover:bg-teal-600/20 hover:text-teal-700 before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full before:opacity-0 hover:before:opacity-100'
                                         ]"
                                     >
-                                        {{ subitem.name }}
-                                        <span class="sr-only" v-html="subitem.name"></span>
-                                    </router-link>
-                                </li>
-                            </template>
+                                        <Icon :name="parent.icon" class="w-4 h-4 mr-2" />
+                                        <span class="flex-1 text-left">{{ parent.name }}</span>
+                                </router-link>
+
+
+                                <ul
+                                    v-if="parent.children.length > 0"
+                                    class="ml-4 mt-1 space-y-1"
+                                    :class="expandedParent === parent.name ? '' : 'hidden'"
+                                >
+
+                                    <li v-for="child in parent.children" :key="child.name">
+                                        <router-link
+                                        :to="child.to"
+                                        class="flex items-center p-2 text-sm font-medium rounded-lg transition-colors group"
+                                        :class="[
+                                            'relative rounded-lg transition-all overflow-hidden',
+                                            isActive(child) 
+                                                ? 'bg-teal-600 text-white shadow-md before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full' 
+                                                : 'text-gray-600 hover:bg-teal-600/20 hover:text-teal-700 before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full before:opacity-0 hover:before:opacity-100'
+                                        ]"
+                                        >
+                                        <Icon :name="child.icon" class="w-4 h-4 mr-2" />
+                                        {{ child.name }}
+                                        </router-link>
+                                    </li>
+                                </ul>
+
+                            </li>
                         </ul>
                     </li>
-
                     <!-- MENU TANPA CHILDREN -->
                     <li v-else>
                         <a 
-                            v-if="item.hasOwnProperty('onClick') && !item.to" 
+                            v-if="header.hasOwnProperty('onClick') && !header.to" 
                             href="#"
                             class="flex items-center p-3 text-sm font-medium rounded-lg transition-colors group"
                             :class="[
                                 'relative rounded-xl transition-all overflow-hidden',
-                                isActive(item) 
+                                isActive(header) 
                                     ? 'bg-teal-600 text-white shadow-md before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full' 
                                     : 'text-gray-600 hover:bg-teal-600/20 hover:text-teal-700 before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full before:opacity-0 hover:before:opacity-100'
                             ]"
-                            @click.prevent="item.onClick"
+                            @click.prevent="header.onClick"
                         >
 
                             <!-- ICON -->
                             <Icon 
-                                :name="item.icon" 
+                                :name="header.icon" 
                                 class="w-5 h-5 flex-shrink-0"
                                 :class="isSidebarMinimized ? 'mx-auto' : 'mr-3'"
                             />
 
                             <!-- LABEL -->
                             <template v-if="!isSidebarMinimized">
-                                <span class="flex-1" v-html="item.name"></span>
-                                <span class="sr-only" v-html="item.name"></span>
+                                <span class="flex-1" v-html="header.name"></span>
+                                <span class="sr-only" v-html="header.name"></span>
 
                                 <span 
-                                    v-if="item.hasOwnProperty('label') && item.label" 
+                                    v-if="header.hasOwnProperty('label') && header.label" 
                                     class="inline-flex justify-center items-center px-2 ml-3 text-xs font-medium text-gray-800 bg-gray-200 rounded-full" 
-                                    v-html="item.label"
+                                    v-html="header.label"
                                 ></span>
                             </template>
                         </a>
@@ -134,11 +167,11 @@
                         <!-- ROUTER-LINK -->
                         <router-link 
                             v-else 
-                            :to="item.to ? item.to : '#'" 
+                            :to="header.to ? header.to : '#'" 
                             class="flex items-center p-3 text-sm font-medium rounded-lg transition-colors group"
                             :class="[
                                 'relative rounded-xl transition-all overflow-hidden',
-                                isActive(item) 
+                                isActive(header) 
                                     ? 'bg-teal-600 text-white shadow-md before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full' 
                                     : 'text-gray-600 hover:bg-teal-600/20 hover:text-teal-700 before:content-[\'\'] before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-2 before:h-full before:bg-yellow-400 before:rounded-l-full before:opacity-0 hover:before:opacity-100'
                             ]"
@@ -146,26 +179,29 @@
 
                             <!-- ICON -->
                             <Icon 
-                                :name="item.icon" 
+                                :name="header.icon" 
                                 class="w-5 h-5 flex-shrink-0"
                                 :class="isSidebarMinimized ? 'mx-auto' : 'mr-3'"
                             />
 
                             <!-- LABEL -->
                             <template v-if="!isSidebarMinimized">
-                                <span class="flex-1" v-html="item.name"></span>
-                                <span class="sr-only" v-html="item.name"></span>
+                                <span class="flex-1" v-html="header.name"></span>
+                                <span class="sr-only" v-html="header.name"></span>
 
                                 <span 
-                                    v-if="item.hasOwnProperty('label') && item.label" 
+                                    v-if="header.hasOwnProperty('label') && header.label" 
                                     class="inline-flex justify-center items-center px-2 ml-3 text-xs font-medium text-gray-800 bg-gray-200 rounded-full" 
-                                    v-html="item.label"
+                                    v-html="header.label"
                                 ></span>
                             </template>
                         </router-link>
                     </li>
 
                 </div>
+
+
+
             </ul>
         </div>
 
@@ -219,7 +255,8 @@ export default {
     data() {
         return {
             isSidebarMinimized: false,
-            currentExpandedMenuItem: null,
+            expandedHeader: null,
+            expandedParent: null,
 
             mainMenu: []
         };
@@ -236,32 +273,59 @@ export default {
 
     mounted() {
         const currentPath = this.router.currentRoute.value.path;
+
         const menuAuthorized = localStorage.getItem('authorizedMenu');
-        this.mainMenu = menuAuthorized ? JSON.parse(menuAuthorized) : this.mainMenu;
+        this.mainMenu = menuAuthorized ? JSON.parse(menuAuthorized) : [];
 
-        const activeParent = this.mainMenu.find(item =>
-            item.children &&
-            item.children.some(child => child.to === currentPath)
-        );
+        this.mainMenu.forEach(header => {
+            if (!header.children) return;
 
-        if (activeParent) {
-            this.currentExpandedMenuItem = activeParent.name;
-        }
+            header.children.forEach(parent => {
+                // jika parent langsung punya route
+                if (parent.to === currentPath) {
+                    this.expandedHeader = header.name;
+                }
 
+                // jika parent punya children (level 3)
+                if (parent.children && parent.children.length > 0) {
+                    const activeChild = parent.children.find(
+                        child => child.to === currentPath
+                    );
+
+                    if (activeChild) {
+                        this.expandedHeader = header.name;
+                        this.expandedParent = parent.name;
+                    }
+                }
+            });
+        });
     },
+
 
     methods: {
         // Cek active route
+        // isActive(item) {
+        //     const currentPath = this.router.currentRoute.value.path;
+
+        //     const isMain = item.to === currentPath;
+        //     const isChild =
+        //         item.children &&
+        //         item.children.some(child => child.to === currentPath);
+
+        //     return isMain || isChild;
+        // },
         isActive(item) {
             const currentPath = this.router.currentRoute.value.path;
 
-            const isMain = item.to === currentPath;
-            const isChild =
-                item.children &&
-                item.children.some(child => child.to === currentPath);
+            if (item.to === currentPath) return true;
 
-            return isMain || isChild;
+            if (item.children && item.children.length > 0) {
+                return item.children.some(child => this.isActive(child));
+            }
+
+            return false;
         },
+
 
         // Cek permission + visibility
         isEnabled(item, type) {
@@ -298,14 +362,27 @@ export default {
         },
 
         // buka / tutup submenu
-        toggleSubmenu(item) {
+        toggleMenu(header) {
             if (this.isSidebarMinimized) return;
 
-            this.currentExpandedMenuItem =
-                this.currentExpandedMenuItem === item.name
+            this.expandedHeader =
+                this.expandedHeader === header.name
                     ? null
-                    : item.name;
-        }
+                    : header.name;
+
+            // reset parent saat ganti header
+            this.expandedParent = null;
+        },
+        toggleSubmenu(parent) {
+            if (this.isSidebarMinimized) return;
+
+            this.expandedParent =
+                this.expandedParent === parent.name
+                    ? null
+                    : parent.name;
+        },
+
+
     }
 };
 </script>
