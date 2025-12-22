@@ -130,8 +130,8 @@ export default {
         }
     },
 
-    mounted() {
-        document.title = "Dashboard";
-    },
+    // mounted() {
+    //     document.title = "Dashboard";
+    // },
 };
 </script>

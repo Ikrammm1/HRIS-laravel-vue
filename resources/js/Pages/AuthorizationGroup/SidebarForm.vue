@@ -9,7 +9,7 @@
 
     <!-- Sidebar -->
     <div
-      class="fixed top-0 right-0 w-full sm:w-[700px] lg:w-[700px] h-full bg-white shadow-xl z-50 transform transition-transform duration-300"
+      class="fixed top-0 right-0 w-full sm:w-[80%] lg:w-[50%] h-full bg-white shadow-xl z-50 transform transition-transform duration-300"
       :class="isOpen ? 'translate-x-0' : 'translate-x-full'"
     >
 

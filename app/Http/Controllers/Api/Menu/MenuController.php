@@ -68,7 +68,6 @@ class MenuController extends Controller
 
     public function authorizeMenu(Request $request)
     {
-        // 1. Dapatkan pengguna yang saat ini login
         $user = Auth::user();
 
         if (!$user) {
@@ -78,80 +77,80 @@ class MenuController extends Controller
             ], 401);
         }
 
-        // 2. Definisikan struktur menu penuh
-        // Di sini Anda dapat memuatnya dari file konfigurasi, database, atau array statis
-        $fullMenu = [
-            [
-                'name' => 'Dashboard',
-                'to' => '/dashboard',
-                'icon' => 'home',
-                'requiresAbility' => 'view dashboard', // Contoh permission/ability
-                'showDesktop' => true,
-                'showMobile' => true,
-            ],
-            [
-                'name' => 'Karyawan',
-                'icon' => 'user-tie',
-                'requiresAbility' => 'manage employee', 
-                'showDesktop' => true,
-                'showMobile' => true,
-                'children' => [
-                    [
-                        'name' => 'Data Karyawan',
-                        'to' => '/employee/list',
-                        'requiresAbility' => 'view employee list',
-                    ],
-                    [
-                        'name' => 'Pengajuan Cuti',
-                        'to' => '/employee/leave',
-                        'requiresAbility' => 'submit leave',
-                    ],
-                ]
-            ],
-            [
-                'name' => 'Pengaturan',
-                'icon' => 'cog',
-                'requiresAbility' => 'manage settings', 
-                'showDesktop' => true,
-                'showMobile' => true,
-                'children' => [
-                    [
-                        'name' => 'Users & Roles',
-                        'to' => '/settings/access',
-                        'requiresAbility' => 'manage user access',
-                    ],
-                    [
-                        'name' => 'System Logs',
-                        'to' => '/settings/logs',
-                        'requiresAbility' => 'view logs',
-                    ],
-                    [
-                        'name' => 'Menu Management',
-                        'to' => '/settings/menu',
-                        'requiresAbility' => 'view menu management',
-                    ],
-                    [
-                        'name' => 'User Management',
-                        'to' => '/settings/user',
-                        'requiresAbility' => 'view user management',
-                    ],
-                    [
-                        'name' => 'Authorization Group',
-                        'to' => '/settings/autherization-group',
-                        'requiresAbility' => 'view authorization group',
-                    ],
-                ]
-            ],
-            
-        ];
+        $menus = Menu::whereHas('authorizationGroups.users', function ($q) use ($user) {
+            $q->where('users.id', $user->id);
+        })
+        ->orderBy('level')
+        ->orderBy('id')
+        ->get();
 
-        // 3. Filter menu berdasarkan otorisasi pengguna
-        // $authorizedMenu = $this->filterMenu($fullMenu, $user);
+        $headers = [];
+        $parents = [];
 
-        // 4. Kembalikan menu yang diotorisasi
+        /**
+         * =========================
+         * LEVEL 1 — HEADER
+         * =========================
+         */
+        foreach ($menus as $menu) {
+            if ($menu->level == 1) {
+                $headers[$menu->id] = [
+                    'name' => $menu->menu_name,
+                    'to' => $menu->url ?: null,
+                    'icon' => $menu->icon,
+                    'requiresAbility' => $menu->description,
+                    'showDesktop' => true,
+                    'showMobile' => true,
+                    'children' => []
+                ];
+            }
+        }
+
+        /**
+         * =========================
+         * LEVEL 2 — PARENT
+         * =========================
+         */
+        foreach ($menus as $menu) {
+            if ($menu->level == 2 && isset($headers[$menu->parent_id])) {
+                $parents[$menu->id] = [
+                    'name' => $menu->menu_name,
+                    'to' => $menu->url ?: null,
+                    'icon' => $menu->icon,
+                    'requiresAbility' => $menu->description,
+                    'showDesktop' => true,
+                    'showMobile' => true,
+                    'children' => []
+                ];
+
+                $headers[$menu->parent_id]['children'][] = &$parents[$menu->id];
+            }
+        }
+
+        /**
+         * =========================
+         * LEVEL 3 — CHILDREN
+         * =========================
+         */
+        foreach ($menus as $menu) {
+            if ($menu->level == 3 && isset($parents[$menu->parent_id])) {
+                $parents[$menu->parent_id]['children'][] = [
+                    'name' => $menu->menu_name,
+                    'to' => $menu->url,
+                    'icon' => $menu->icon,
+                    'requiresAbility' => $menu->description,
+                    'showDesktop' => true,
+                    'showMobile' => true,
+                    'children' => []
+                ];
+            }
+        }
+
+        $dataMenu = array_values($headers);
+
         return response()->json([
             'message' => 'Authorized menu fetched successfully.',
-            'data' => $fullMenu
+            'data' => $dataMenu
         ], 200);
     }
 

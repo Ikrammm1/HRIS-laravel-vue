@@ -112,6 +112,16 @@ const routes = [
             layout: 'default',
         },
     },
+    {
+        path: '/employe',
+        name: 'employe',
+        component: AuthGroup ,
+        meta: {
+            requiresAuth: true,
+            title: 'Data Karyawan',
+            layout: 'default',
+        },
+    },
     
     // // Employees Routes
     // {
