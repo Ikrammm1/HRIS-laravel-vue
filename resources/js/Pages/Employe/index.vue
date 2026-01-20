@@ -2,7 +2,7 @@
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Menu Management
+                {{ title }}
             </h2>
         </template>
 
@@ -24,7 +24,7 @@
                         <vue-good-table
                             :line-numbers="true"
                             :columns="columns"
-                            :rows="menuList"
+                            :rows="employeList"
                             :search-options="{ enabled: false }"
                             :pagination-options="{
                                 enabled: true,
@@ -34,9 +34,23 @@
                         >
                             <!-- Vue 3 slot syntax -->
                             <template #table-row="props">
-                                
+                                <div
+                                    v-if="props.column.field === 'icon'"
+                                    class="flex items-center justify-center w-full h-full"
+                                >
+                                    <Icon :name="props.row.icon" class="text-md" />
+                                </div>
+                                <span v-else-if="props.column.field === 'level'">
+                                    <span v-html="props.row.level"></span>
+                                </span>
+                                <span v-else-if="props.column.field === 'score'">
+                                    {{ (props.row.score * 100).toFixed(2) }} %
+                                </span>
+                                <span v-else-if="props.column.field === 'parent_id'">
+                                    <span>{{ this.$store.state.menu.menus.find(menu => menu.id == props.row.parent_id)?.menu_name}} </span>
+                                </span>
                                 <span
-                                    v-if="props.column.field === 'action'"
+                                    v-else-if="props.column.field === 'action'"
                                     class="flex items-center gap-2"
                                 >
                                     <button
@@ -52,29 +66,6 @@
                                     >
                                         <Icon name="trash" class="text-xs"  />
                                     </button>
-                                </span>
-
-                               <span
-                                    v-else-if="props.column.field === 'level'"
-                                    class="flex items-center gap-2"
-                                    >
-                                    {{
-                                        props.row.level == 1
-                                        ? 'Header'
-                                        : props.row.level == 2
-                                            ? 'Parent'
-                                            : 'Children'
-                                    }}
-                                </span>
-                                <Icon v-else-if="props.column.field == 'icon'" :name="props.row.icon" class="inline-block mr-2 text-base" />
-                                
-                                <span
-                                    v-else-if="props.column.field === 'parent_id'"
-                                    class="flex items-center gap-2"
-                                    >
-                                    {{
-                                        this.$store.state.menu.menus.find(menu => menu.id == props.row.parent_id)?.menu_name ?? '-'
-                                    }}
                                 </span>
 
 
@@ -116,7 +107,6 @@ import menu from '@/store/modules/menu';
 import SidebarForm from "./SidebarForm.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import { showConfirmDialog } from '@rmsjs/vue3-dialog-tw'
 import ConfirmDialog from '../../Components/ConfirmDialog.vue'
 
 export default {
@@ -124,77 +114,64 @@ export default {
 
     data() {
         return {
-                title: "Menu Management",
+                title: "Employe Management",
                 columns: [
                     {
-                        label: 'Icon', // Kolom untuk ikon
-                        field: 'icon',
-                        sortable: false, // Ikon biasanya tidak perlu di-sort
-                       
-                    },
-                    {
-                        label: 'Name', // Kolom untuk nama
-                        field: 'menu_name',
+                        label: 'Full Name',
+                        field: 'full_name', // Sesuai kolom di migration
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter Nama',
+                            placeholder: 'Cari Nama',
                         },
                     },
                     {
-                        label: 'Description', // Kolom untuk deskripsi
-                        field: 'description',
-                        sortable: false, // Deskripsi panjang mungkin tidak perlu di-sort
+                        label: 'Email',
+                        field: 'email',
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter Deskripsi',
+                            placeholder: 'Filter Email',
                         },
                     },
                     {
-                        label: 'URL', // Kolom untuk URL
-                        field: 'url',
-                        sortable: false,
+                        label: 'Division',
+                        field: 'division.div_name', // Mengambil nama divisi dari relasi
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter URL',
+                            placeholder: 'Semua Divisi',
                         },
                     },
                     {
-                        label: 'Parent Menu', // Kolom untuk parent_id
-                        field: 'parent_id',
+                        label: 'Department',
+                        field: 'department.dept_name', // Mengambil nama dept dari relasi
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter Parent ID',
+                            placeholder: 'Semua Dept',
                         },
                     },
                     {
-                        label: 'Level', // Kolom untuk level/hak akses
-                        field: 'level',
+                        label: 'Position',
+                        field: 'position',
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Pilih Level',
-                            filterDropdownItems: [
-                            { value: 1, text: 'Header' },
-                            { value: 2, text: 'Parent' },
-                            { value: 3, text: 'Childrent' },
-                            ],
+                            placeholder: 'Cari Jabatan',
                         },
                     },
                     {
-                        label: 'Action', // Kolom untuk tombol aksi (Edit/Delete)
+                        label: 'Active',
+                        field: 'is_active',
+                        type: 'boolean',
+                        filterOptions: {
+                            enabled: true,
+                        },
+                    },
+                    {
+                        label: 'Action',
                         field: 'action',
-                        sortable: false, // Kolom aksi tidak bisa di-sort
-                        filterOptions: {
-                            enabled: false, // Filter dinonaktifkan untuk kolom Action
-                        },
+                        sortable: false,
                     },
                 ],
             
                 // Contoh Data (Rows)
-                rows: [
-                    { id: 1, icon: '🏠', name: 'Home', description: 'Halaman Utama Aplikasi', url: '/', level: 1, action: '' },
-                    { id: 2, icon: '👤', name: 'Users', description: 'Manajemen Pengguna', url: '/users', level: 1, action: '' },
-                    { id: 3, icon: '📰', name: 'Blog', description: 'Daftar Artikel Blog', url: '/blog', level: 2, action: '' },
-                ],
                 isSidebarOpen: false,
                 actionType: 'add',   // add | update
                 selectedData: null, // data row
@@ -203,8 +180,8 @@ export default {
             };
     },
     computed: {
-        menuList() {
-            return this.$store.state.menu.menus;
+        employeList() {
+            return this.$store.state.employe.datas;
         },
     },
     methods: {
@@ -219,7 +196,7 @@ export default {
             formData.append('id', id)
             this.$store.commit("SET_LOADING", true)
 
-            this.$store.dispatch("menu/delete", { formData, id }).then(() => {
+            this.$store.dispatch("employe/delete", { formData, id }).then(() => {
             toast.success(
                 `Data has been deleted`,
                 {
@@ -256,7 +233,9 @@ export default {
     async created() {
         this.$store.commit("SET_LOADING", true);
         try {
-            await this.$store.dispatch("menu/menuList");
+            await this.$store.dispatch("employe/list");
+            await this.$store.dispatch("divisions/list");
+            await this.$store.dispatch("departments/list");
         } finally {
             this.$store.commit("SET_LOADING", false);
         }

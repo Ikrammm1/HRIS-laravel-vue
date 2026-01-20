@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Menu\MenuController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\AuthorizationGroup\AuthorizationGroupController;
+use App\Http\Controllers\Api\Organization\DivisionController;
+use App\Http\Controllers\Api\Organization\DepartmentController;
+use App\Http\Controllers\Api\Employe\EmployeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,8 +47,23 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/groups/update/{id}', [AuthorizationGroupController::class, 'update']);
     Route::delete('/groups/delete/{id}', [AuthorizationGroupController::class, 'destroy']);
 
-
+    //Organization
+    Route::get('/divisions/list', [DivisionController::class, 'index']);
+    Route::post('/divisions/add', [DivisionController::class, 'store']);
+    Route::post('/divisions/update/{id}', [DivisionController::class, 'update']);
+    Route::delete('/divisions/delete/{id}', [DivisionController::class, 'destroy']);
     
+    Route::get('/departments/list', [DepartmentController::class, 'index']);
+    Route::post('/departments/add', [DepartmentController::class, 'store']);
+    Route::post('/departments/update/{id}', [DepartmentController::class, 'update']);
+    Route::delete('/departments/delete/{id}', [DepartmentController::class, 'destroy']);
+    
+    //employes
+    Route::get('/employees/list', [EmployeController::class, 'index']);
+    Route::post('/employees/add', [EmployeController::class, 'store']);
+    Route::post('/employees/update/{id}', [EmployeController::class, 'update']);
+    Route::delete('/employees/delete/{id}', [EmployeController::class, 'destroy']);
+
     // Add other protected routes here
     // Route::apiResource('users', UserController::class);
     // Route::apiResource('employees', EmployeeController::class);
