@@ -3,6 +3,9 @@ import AuthModule from './modules/auth';
 import MenuModule from './modules/menu';
 import UserModule from './modules/users';
 import Autherization from './modules/authorizationGroup';
+import Division from './modules/division';
+import Department from './modules/department';
+import Employe from './modules/employe';
 
 export default createStore({
     state: {
@@ -23,5 +26,8 @@ export default createStore({
         menu: MenuModule,
         users: UserModule,
         authorizationGroup: Autherization,
+        divisions: Division,
+        departments: Department,
+        employe: Employe,
     },
 });

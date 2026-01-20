@@ -11,6 +11,10 @@ const Profile = () => import('@/Pages/Profile/Edit.vue');
 const Menus = () => import('@/Pages/Menu/index.vue')
 const Users = () => import('@/Pages/User/index.vue')
 const AuthGroup = () => import('@/Pages/AuthorizationGroup/index.vue')
+const Employe = () => import('@/Pages/Employe/index.vue')
+const Division = () => import('@/Pages/Organization/Division/index.vue')
+const Department = () => import('@/Pages/Organization/Department/index.vue')
+// const EmployeesIndex = () => import('@/views/employees/Index.vue');
 // const NotFound = () => import('@/NotFound.vue');
 
 const routes = [
@@ -115,13 +119,36 @@ const routes = [
     {
         path: '/employe',
         name: 'employe',
-        component: AuthGroup ,
+        component: Employe ,
         meta: {
             requiresAuth: true,
-            title: 'Data Karyawan',
+            title: 'Employe Management',
             layout: 'default',
         },
     },
+
+    // Organization Routes
+    {
+        path: '/organization/divisions',
+        name: 'Organization-divisions',
+        component: Division,    
+        meta: {
+            requiresAuth: true,
+            title: 'Divisions',
+            layout: 'default',
+        },
+    },
+    {
+        path: '/organization/departments',
+        name: 'Organization-departments',
+        component: Department,
+        meta: {
+            requiresAuth: true,
+            title: 'Departments',
+            layout: 'default',
+        },
+    },
+    
     
     // // Employees Routes
     // {
