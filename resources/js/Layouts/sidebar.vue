@@ -1,7 +1,7 @@
 <template>
     <aside 
         :class="[
-            'relative bg-gradient-to-b from-teal-50 to-gray-50 h-screen hidden sm:block shadow-xl transition-all duration-300 ease-in-out',
+            'relative bg-gradient-to-b from-teal-50 to-gray-50 h-screen block shadow-xl transition-all duration-300 ease-in-out',
             isSidebarMinimized ? 'w-20' : 'w-60' // Menggunakan isSidebarMinimized lokal
         ]"
     >
@@ -299,6 +299,10 @@ export default {
                 }
             });
         });
+
+        // Set minimized based on screen size
+        this.handleResize();
+        window.addEventListener('resize', this.handleResize);
     },
 
 
@@ -381,8 +385,15 @@ export default {
                     ? null
                     : parent.name;
         },
+        handleResize() {
+            this.isSidebarMinimized = window.innerWidth < 640; // sm breakpoint
+        },
 
 
+    },
+
+    beforeUnmount() {
+        window.removeEventListener('resize', this.handleResize);
     }
 };
 </script>

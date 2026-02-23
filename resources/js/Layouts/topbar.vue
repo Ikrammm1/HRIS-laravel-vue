@@ -1,5 +1,5 @@
 <template>
-    <header class="w-full items-center justify-between bg-gradient-to-r from-yellow-200 via-yellow-100 to-orange-100 px-4 hidden sm:flex shadow-sm">
+    <header class="w-full items-center justify-between bg-gradient-to-r from-yellow-200 via-yellow-100 to-orange-100 px-4 flex shadow-sm">
         
         <!-- Search Bar -->
         <div class="flex-1 max-w-xl relative">
