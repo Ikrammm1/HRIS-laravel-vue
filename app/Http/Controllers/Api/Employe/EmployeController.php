@@ -14,7 +14,7 @@ class EmployeController extends Controller
     // Menampilkan semua karyawan
     public function index()
     {
-        $employees = Employe::with('division', 'department')->where('is_active', 1)->get();
+        $employees = Employe::with('division', 'department')->get();
         return response()->json($employees);
     }
 
@@ -26,17 +26,17 @@ class EmployeController extends Controller
             'email' => 'required|email|unique:hris_employes,email|unique:users,email',
             'div_code' => 'required',
             'dept_code' => 'required',
-            'phone_number' => 'required',
+            'phone_number' => 'nullable|string|max:20',
             'gender' => 'required',
             'position' => 'required',
             'employee_status' => 'required',
             'join_date' => 'required',
-            'svp' => 'required',
+            'svp' => 'nullable',
             'date_of_birth' => 'required',
             'place_of_birth' => 'required',
-            'address' => 'required',
+            'address' => 'nullable',
             'religion' => 'required',
-            'marital_status' => 'required',
+            'merital_status' => 'required',
 
         ]);
 
@@ -59,7 +59,7 @@ class EmployeController extends Controller
                 'place_of_birth' => $request->place_of_birth,
                 'address' => $request->address,
                 'religion' => $request->religion,
-                'marital_status' => $request->marital_status,
+                'merital_status' => $request->merital_status,
             ]);
 
             // 2. Simpan ke tabel users (untuk login)
@@ -70,7 +70,9 @@ class EmployeController extends Controller
                 'hris_employe_id' => $employee->id, // Foreign Key yang kita buat tadi
             ]);
 
-            return response()->json(['message' => 'Employee and User created successfully'], 201);
+            $employee = Employe::with('division', 'department')->where('id', $employee->id)->first(); // Pastikan data terbaru diambil
+
+            return response()->json(['message' => 'Employee and User created successfully', 'data' => $employee], 200);
         });
     }
 
@@ -87,7 +89,9 @@ class EmployeController extends Controller
         $employee = Employe::findOrFail($id);
         $employee->update($request->all());
 
-        return response()->json(['message' => 'Employee updated successfully']);
+        $employee = Employe::with('division', 'department')->where('id', $employee->id)->first(); // Pastikan data terbaru diambil
+
+        return response()->json(['message' => 'Employee updated successfully', 'data' => $employee], 200);
     }
 
     // Hapus karyawan (akan terhapus juga di tabel User karena 'cascade')

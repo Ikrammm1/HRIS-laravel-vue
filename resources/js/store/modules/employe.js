@@ -13,7 +13,7 @@ const mutations = {
         state.datas.unshift(data);
     },
     UPDATE_ITEM(state,data){
-        const index = state.datas.findIndex(item => item.id === data.id);
+        const index = state.datas.findIndex(item => item.id == data.id);
         if (index !== -1) {
             state.datas.splice(index, 1, data);
         }

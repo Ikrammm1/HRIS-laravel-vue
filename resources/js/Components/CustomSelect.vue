@@ -110,20 +110,9 @@
       )
     }
   },
-
-  methods: {
-    select(item) {
-      this.search = item[this.labelKey]
-      this.open = false
-      this.$emit("update:modelValue", item[this.valueKey])
-    }
-  },
-
   mounted() {
-    const selected = this.options.find(
-      o => o[this.valueKey] === this.modelValue
-    )
-    if (selected) this.search = selected[this.labelKey]
+    // try to set initial search label if modelValue present and option exists
+    this.setSelectedLabel()
 
     // klik di luar → close
     document.addEventListener("click", this.handleClickOutside)
@@ -133,7 +122,25 @@
     document.removeEventListener("click", this.handleClickOutside)
   },
 
+  watch: {
+    modelValue() {
+      this.setSelectedLabel()
+    },
+    options() {
+      // options may be loaded async; ensure label reflects current modelValue
+      this.setSelectedLabel()
+    }
+  },
+
   methods: {
+    setSelectedLabel() {
+      const selected = this.options.find(
+        o => o[this.valueKey] === this.modelValue
+      )
+      if (selected) this.search = selected[this.labelKey]
+      else this.search = ''
+    },
+
     select(item) {
       this.search = item[this.labelKey]
       this.open = false
