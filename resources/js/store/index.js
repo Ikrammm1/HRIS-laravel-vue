@@ -6,6 +6,10 @@ import Autherization from './modules/authorizationGroup';
 import Division from './modules/division';
 import Department from './modules/department';
 import Employe from './modules/employe';
+import shift from './modules/shift';
+import workSchedule from './modules/workSchedule';
+import holidayCalendar from './modules/holidayCalendar';
+import leaveType from './modules/leaveType';
 
 export default createStore({
     state: {
@@ -29,5 +33,9 @@ export default createStore({
         divisions: Division,
         departments: Department,
         employe: Employe,
+        shift,
+        workSchedule,
+        holidayCalendar,
+        leaveType,
     },
 });

@@ -234,7 +234,7 @@ export default {
       }
       formData.append('dept_code', this.dept_code)
       formData.append('dept_name', this.dept_name)
-      formData.append('division_id', this.div_code)
+      formData.append('div_code', this.div_code)
 
       const id = this.id
 

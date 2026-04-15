@@ -1,15 +1,25 @@
 <template>
-    <header class="w-full items-center justify-between bg-gradient-to-r from-yellow-200 via-yellow-100 to-orange-100 px-4 hidden sm:flex shadow-sm">
+    <header class="w-full items-center justify-between bg-gradient-to-r from-yellow-200 via-yellow-100 to-orange-100 px-4 flex shadow-sm">
         
         <!-- Search Bar -->
-        <div class="flex-1 max-w-xl">
+        <div class="flex-1 max-w-xl relative">
             <div class="relative">
                 <Icon name="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"/>
                 <input
+                    v-model="searchQuery"
                     type="text"
-                    placeholder="Search"
+                    placeholder="Search menus..."
                     class="w-full pl-10 pr-4 py-2 bg-white rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    @focus="showSuggestions = true"
+                    @blur="hideSuggestions"
+                    @keydown="handleKeydown"
                 />
+            </div>
+            <!-- Suggestions Dropdown -->
+            <div v-if="showSuggestions && filteredMenus.length" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
+                <div v-for="(menu, index) in filteredMenus" :key="menu.name + menu.to" @mousedown="selectMenu(menu)" :class="['px-4 py-2 cursor-pointer text-sm text-gray-700', index === selectedIndex ? 'bg-teal-100' : 'hover:bg-teal-50']">
+                    {{ menu.name }}
+                </div>
             </div>
         </div>
 
@@ -95,6 +105,10 @@ export default {
             email: JSON.parse(localStorage.getItem('authUser')).email || '',
             photo: '',
             isAccountDropdownOpen: false,  // FIX
+            searchQuery: '',
+            showSuggestions: false,
+            menus: [],
+            selectedIndex: -1,
         };
     },
 
@@ -102,9 +116,30 @@ export default {
         avatarInitial() {
             if (!this.userName) return "?";
             return this.userName.charAt(0).toUpperCase();
+        },
+        flattenedMenus() {
+            return this.flattenMenus(this.menus);
+        },
+        filteredMenus() {
+            if (!this.searchQuery) return [];
+            return this.flattenedMenus.filter(menu => 
+                menu.name && menu.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+            );
         }
     },
     methods: {
+        flattenMenus(menus) {
+            let result = [];
+            menus.forEach(menu => {
+                if (menu.name && menu.to && menu.to !== '-') {
+                    result.push(menu);
+                }
+                if (menu.children && menu.children.length > 0) {
+                    result = result.concat(this.flattenMenus(menu.children));
+                }
+            });
+            return result;
+        },
         async onLogout() {
             this.$store.commit("SET_LOADING", true);
             try{
@@ -115,6 +150,53 @@ export default {
 
             // Redirect ke login
             // this.$router.push({ name: "login" });
+        },
+        selectMenu(menu) {
+            this.searchQuery = menu.name;
+            this.showSuggestions = false;
+            // Navigate to menu route if available
+            if (menu.to && menu.to !== '-') {
+                this.$router.push(menu.to);
+            }
+        },
+        hideSuggestions() {
+            setTimeout(() => {
+                this.showSuggestions = false;
+                this.selectedIndex = -1;
+            }, 200);
+        },
+        handleKeydown(event) {
+            if (!this.showSuggestions || this.filteredMenus.length === 0) return;
+
+            switch (event.key) {
+                case 'ArrowDown':
+                    event.preventDefault();
+                    this.selectedIndex = (this.selectedIndex + 1) % this.filteredMenus.length;
+                    break;
+                case 'ArrowUp':
+                    event.preventDefault();
+                    this.selectedIndex = this.selectedIndex <= 0 ? this.filteredMenus.length - 1 : this.selectedIndex - 1;
+                    break;
+                case 'Enter':
+                    event.preventDefault();
+                    if (this.selectedIndex >= 0) {
+                        this.selectMenu(this.filteredMenus[this.selectedIndex]);
+                    }
+                    break;
+                case 'Escape':
+                    this.showSuggestions = false;
+                    this.selectedIndex = -1;
+                    break;
+            }
+        }
+    },
+
+    watch: {
+        '$store.state.menu.authorizedMenu'(newMenus) {
+            this.menus = newMenus || [];
+        },
+        searchQuery() {
+            this.selectedIndex = -1;
         }
     },
 
@@ -127,6 +209,12 @@ export default {
             this.userName = userData.name;
             this.email = userData.email;
             this.photo = userData.photo ?? ""; // aman jika null
+        }
+
+        // Load menus from localStorage
+        const storedMenus = localStorage.getItem('authorizedMenu');
+        if (storedMenus) {
+            this.menus = JSON.parse(storedMenus);
         }
     },
 

@@ -9,6 +9,11 @@ use App\Http\Controllers\Api\AuthorizationGroup\AuthorizationGroupController;
 use App\Http\Controllers\Api\Organization\DivisionController;
 use App\Http\Controllers\Api\Organization\DepartmentController;
 use App\Http\Controllers\Api\Employe\EmployeController;
+use App\Http\Controllers\Api\Setup\ShiftController;
+use App\Http\Controllers\Api\Setup\LeaveTypeController;
+use App\Http\Controllers\Api\Setup\WorkScheduleController;
+use App\Http\Controllers\Api\Setup\HolidayCalendarController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +69,26 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/employees/update/{id}', [EmployeController::class, 'update']);
     Route::delete('/employees/delete/{id}', [EmployeController::class, 'destroy']);
 
+    //setup
+    Route::get('/setup/shifts/list', [ShiftController::class, 'index']);
+    Route::post('/setup/shifts/add', [ShiftController::class, 'store']);
+    Route::post('/setup/shifts/update/{id}', [ShiftController::class, 'update']);
+    Route::delete('/setup/shifts/delete/{id}', [ShiftController::class, 'destroy']);
+
+    Route::get('/setup/work-schedules/list', [WorkScheduleController::class, 'index']);
+    Route::post('/setup/work-schedules/add', [WorkScheduleController::class, 'store']);
+    Route::post('/setup/work-schedules/update/{id}', [WorkScheduleController::class, 'update']);
+    Route::delete('/setup/work-schedules/delete/{id}', [WorkScheduleController::class, 'destroy']);
+
+    Route::get('/setup/holiday-calendars/list', [HolidayCalendarController::class, 'index']);
+    Route::post('/setup/holiday-calendars/add', [HolidayCalendarController::class, 'store']);
+    Route::post('/setup/holiday-calendars/update/{id}', [HolidayCalendarController::class, 'update']);
+    Route::delete('/setup/holiday-calendars/delete/{id}', [HolidayCalendarController::class, 'destroy']);
+
+    Route::get('/setup/leave-types/list', [LeaveTypeController::class, 'index']);
+    Route::post('/setup/leave-types/add', [LeaveTypeController::class, 'store']);
+    Route::post('/setup/leave-types/update/{id}', [LeaveTypeController::class, 'update']);
+    Route::delete('/setup/leave-types/delete/{id}', [LeaveTypeController::class, 'destroy']);
     // Add other protected routes here
     // Route::apiResource('users', UserController::class);
     // Route::apiResource('employees', EmployeeController::class);

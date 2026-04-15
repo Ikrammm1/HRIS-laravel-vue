@@ -24,6 +24,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             HrisOrganizationSeeder::class,
             HrisEmployeeSeeder::class,
+            ShiftSeeder::class,
+            WorkScheduleSeeder::class,
+            HolidayCalendarSeeder::class,
+            LeaveTypeSeeder::class,
         ]);
     }
 }

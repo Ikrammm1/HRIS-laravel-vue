@@ -14,6 +14,10 @@ const AuthGroup = () => import('@/Pages/AuthorizationGroup/index.vue')
 const Employe = () => import('@/Pages/Employe/index.vue')
 const Division = () => import('@/Pages/Organization/Division/index.vue')
 const Department = () => import('@/Pages/Organization/Department/index.vue')
+const Shift = () => import('@/Pages/Setup/Shift/index.vue')
+const WorkSchedule = () => import('@/Pages/Setup/WorkSchedule/index.vue')
+const HolidayCalendar = () => import('@/Pages/Setup/HolidayCalendar/index.vue')
+const LeaveType = () => import('@/Pages/Setup/LeaveType/index.vue')
 // const EmployeesIndex = () => import('@/views/employees/Index.vue');
 // const NotFound = () => import('@/NotFound.vue');
 
@@ -148,6 +152,51 @@ const routes = [
             layout: 'default',
         },
     },
+
+    //==========================================================
+    // Setup Routes
+    //==========================================================
+    {
+        path: '/setup/shift',
+        name: 'Setup-shifts',
+        component: Shift,
+        meta: {
+            requiresAuth: true,
+            title: 'Shifts',
+            layout: 'default',
+        },
+    },
+    {
+        path: '/setup/work-schedule',
+        name: 'Setup-work-schedules',
+        component: WorkSchedule,
+        meta: {
+            requiresAuth: true,
+            title: 'Work Schedules',
+            layout: 'default',
+        },
+    },
+    {
+        path: '/setup/holiday-calendar',
+        name: 'Setup-holiday-calendars',
+        component: HolidayCalendar,
+        meta: {
+            requiresAuth: true,
+            title: 'Holiday Calendars',
+            layout: 'default',
+        },
+    },
+    {
+        path: '/setup/leave-types',
+        name: 'Setup-leave-types',
+        component: LeaveType,
+        meta: {
+            requiresAuth: true,
+            title: 'Leave Types',
+            layout: 'default',
+        },
+    },
+
     
     
     // // Employees Routes
