@@ -25,22 +25,35 @@ export default {
   actions: {
     async fetchAll({ commit }) {
       commit('SET_LOADING', true);
-      const res = await axios.get('/api/setup/holiday-calendars');
+      const res = await axios.get('/api/setup/holiday-calendars/list');
       commit('SET_DATAS', res.data.data);
       commit('SET_LOADING', false);
     },
     async process({ commit }, { formData, id }) {
       if (id) {
-        const res = await axios.put(`/api/setup/holiday-calendars/${id}`, formData);
+        const res = await axios.post(`/api/setup/holiday-calendars/update/${id}`, formData);
         commit('UPDATE_DATA', res.data.data);
       } else {
-        const res = await axios.post('/api/setup/holiday-calendars', formData);
+        const res = await axios.post('/api/setup/holiday-calendars/add', formData);
         commit('ADD_DATA', res.data.data);
       }
     },
-    async remove({ commit }, id) {
-      await axios.delete(`/api/setup/holiday-calendars/${id}`);
-      commit('DELETE_DATA', id);
+    remove({ commit }, data) {
+      return new Promise((resolve, reject) => {
+        axios.delete(`/api/setup/holiday-calendars/delete/${data.id}`, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(response => {       
+                commit("DELETE_DATA", data.id);
+                resolve(response.data.message);
+
+            })
+            .catch(error => {
+                reject(error);
+            });
+        })
     },
   },
 };

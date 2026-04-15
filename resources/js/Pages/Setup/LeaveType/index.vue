@@ -24,7 +24,7 @@
                     <vue-good-table
                         :line-numbers="true"
                         :columns="columns"
-                        :rows="shifts"
+                        :rows="leaveTypes"
                         :search-options="{ enabled: false }"
                         :pagination-options="{
                             enabled: true,
@@ -53,17 +53,27 @@
                                     <Icon name="trash" class="text-xs"  />
                                 </button>
                             </span>
-                            <span v-else-if="props.column.field === 'is_overnight'">
-                                <span
-                                    class="px-2 py-1 rounded text-xs"
-                                    :class="props.formattedRow.is_overnight ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'"
-                                >
-                                    {{ props.formattedRow.is_overnight ? 'Yes' : 'No' }}
+                            <span v-else-if="props.column.field === 'max_days'">
+                                {{ props.formattedRow.max_days }} hari
+                                
+                            </span>
+                            <span v-else-if="props.column.field === 'is_paid'">
+                                <span class="px-2 py-1 rounded text-xs" :class="props.formattedRow.is_paid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'">
+                                  {{ props.formattedRow.is_paid ? 'Paid' : 'Unpaid' }}
                                 </span>
                             </span>
-                            
-                            <span v-else-if="props.column.field === 'start_time' || props.column.field === 'end_time'">
-                                {{ props.formattedRow[props.column.field] ? props.formattedRow[props.column.field].substring(0,5) : '-'}}
+                            <span v-else-if="props.column.field === 'gender_specific'">
+                                {{ props.formattedRow.gender_specific ? props.formattedRow.gender_specific : 'All' }}
+                            </span>
+                            <span v-else-if="props.column.field === 'approval_steps'">
+                                <div class="flex items-center gap-1 flex-wrap">
+                                  <template v-for="(step, idx) in props.formattedRow.approval_steps" :key="step.id">
+                                    <span class="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200">
+                                      {{ idx + 1 }}. {{ formatApproverType(step.approver_type) }}
+                                    </span>
+                                    <span v-if="idx < props.formattedRow.approval_steps.length - 1" class="text-gray-400 text-xs">→</span>
+                                  </template>
+                                </div>
                             </span>
                                 
 
@@ -127,8 +137,8 @@ export default {
                         },
                     },
                     {
-                        label: 'Start',
-                        field: 'start_time',
+                        label: 'Max Day',
+                        field: 'max_days',
                         sortable: false,
                         filterOptions: {
                             enabled: true,
@@ -136,27 +146,27 @@ export default {
                         },
                     },
                     {
-                        label: 'End',
-                        field: 'end_time',
+                        label: 'Paid',
+                        field: 'is_paid',
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter End Time',
+                            placeholder: 'Filter Paid',
                         },
                     },
                     {
-                        label: 'Break (min)',
-                        field: 'break_duration',
+                        label: 'Gender',
+                        field: 'gender_specific',
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter Break Minutes',
+                            placeholder: 'Filter Gender',
                         },
                     },
                     {
-                        label: 'Overnight',
-                        field: 'is_overnight',
+                        label: 'Approval Steps',
+                        field: 'approval_steps',
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter Overnight',
+                            placeholder: 'Filter Approval Steps',
                         },
                     },
                     // {
@@ -188,20 +198,20 @@ export default {
     };
   },
   computed: {
-    // shifts(){
+    // leaveTypes(){
     //   return [];
     // },
-    shifts() { return this.$store.state.shift.datas; },
-    loading() { return this.$store.state.shift.loading; },
+    leaveTypes() { return this.$store.state.leaveType.datas; },
+    loading() { return this.$store.state.leaveType.loading; },
 
   },
   mounted() {
-    this.$store.dispatch('shift/fetchAll');
+    this.$store.dispatch('leaveType/fetchAll');
   },
   // async created() {
   //     this.$store.commit("SET_LOADING", true);
   //     try {
-  //         await this.$store.dispatch("shift/datas");
+  //         await this.$store.dispatch("leaveType/datas");
   //     } finally {
   //         this.$store.commit("SET_LOADING", false);
   //     }
@@ -218,7 +228,7 @@ export default {
         formData.append('id', id)
         this.$store.commit("SET_LOADING", true)
 
-        this.$store.dispatch("shift/remove", { formData, id }).then(() => {
+        this.$store.dispatch("leaveType/remove", { formData, id }).then(() => {
         toast.success(
             `Data has been deleted`,
             {
@@ -251,7 +261,16 @@ export default {
       console.log('Deleting item with id:', this.deleteId)
         this.onDelete(this.deleteId)
         this.showConfirm = false
-    }
+    },
+    formatApproverType(type) {
+      const map = {
+        direct_svp: 'Direct SVP',
+        division_head: 'Div. Head',
+        hr: 'HR',
+        specific_user: 'Specific User',
+      };
+      return map[type] || type;
+    },
   },
 };
 </script>

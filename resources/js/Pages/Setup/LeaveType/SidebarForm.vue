@@ -280,7 +280,7 @@ export default {
           formData: this.form,
           id: this.action === 'update' ? this.form.id : null,
         });
-        toast.success(`Leave type berhasil ${this.action === 'add' ? 'ditambahkan' : 'diupdate'}`, {
+        toast.success(`Leave type saved successfully`, {
           position: 'bottom-center', autoClose: 2000,
         });
         this.closeSidebar();

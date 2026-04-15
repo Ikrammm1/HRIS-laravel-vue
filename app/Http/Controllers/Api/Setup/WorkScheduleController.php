@@ -17,10 +17,10 @@ class WorkScheduleController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code'      => 'required|unique:work_schedules,code',
+            'code'      => 'required|unique:hris_work_schedules,code',
             'name'      => 'required',
             'work_days' => 'required|array|min:1',
-            'shift_id'  => 'required|exists:shifts,id',
+            'shift_id'  => 'required|exists:hris_shifts,id',
         ]);
 
         $data = WorkSchedule::create([
@@ -36,10 +36,10 @@ class WorkScheduleController extends Controller
         $schedule = WorkSchedule::findOrFail($id);
 
         $request->validate([
-            'code'      => 'required|unique:work_schedules,code,' . $id,
+            'code'      => 'required|unique:hris_work_schedules,code,' . $id,
             'name'      => 'required',
             'work_days' => 'required|array|min:1',
-            'shift_id'  => 'required|exists:shifts,id',
+            'shift_id'  => 'required|exists:hris_shifts,id',
         ]);
 
         $schedule->update($request->only(['code','name','work_days','shift_id','is_active']));

@@ -9,7 +9,7 @@
                       <div>
                         
                         <h2 class="text-2xl">{{ title }}</h2>
-                        <p class="text-gray-500 text-sm">Kelola jenis cuti beserta alur approval-nya</p>
+                        <p class="text-gray-500 text-sm">Manage holiday calendar entries</p>
                       </div>
                       <button
                           @click="openSidebar('add')"
@@ -24,7 +24,7 @@
                     <vue-good-table
                         :line-numbers="true"
                         :columns="columns"
-                        :rows="shifts"
+                        :rows="holidayCalendar"
                         :search-options="{ enabled: false }"
                         :pagination-options="{
                             enabled: true,
@@ -53,17 +53,21 @@
                                     <Icon name="trash" class="text-xs"  />
                                 </button>
                             </span>
-                            <span v-else-if="props.column.field === 'is_overnight'">
+                            <span v-else-if="props.column.field === 'type'">
                                 <span
                                     class="px-2 py-1 rounded text-xs"
-                                    :class="props.formattedRow.is_overnight ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'"
+                                    :class="props.formattedRow.type=='national' ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'"
                                 >
-                                    {{ props.formattedRow.is_overnight ? 'Yes' : 'No' }}
+                                    {{ props.formattedRow.type=='national' ? 'National' : 'Company' }}
                                 </span>
                             </span>
                             
-                            <span v-else-if="props.column.field === 'start_time' || props.column.field === 'end_time'">
-                                {{ props.formattedRow[props.column.field] ? props.formattedRow[props.column.field].substring(0,5) : '-'}}
+                            <span v-else-if="props.column.field === 'date'">
+                                {{
+                                    props.formattedRow[props.column.field]
+                                    ? previewDay(props.formattedRow[props.column.field])
+                                    : "-"
+                                }}
                             </span>
                                 
 
@@ -107,19 +111,11 @@ export default {
   components: { AuthenticatedLayout, SidebarForm, ConfirmDialog, Icon },
   data() {
     return {
-      title: 'Leave Type',
+      title: 'Holiday Calendar',
       columns: [
                     
                     {
-                        label: 'Code', 
-                        field: 'code',
-                        filterOptions: {
-                            enabled: true,
-                            placeholder: 'Filter Code',
-                        },
-                    },
-                    {
-                        label: 'Name', // Kolom untuk 
+                        label: 'Name', 
                         field: 'name',
                         filterOptions: {
                             enabled: true,
@@ -127,36 +123,29 @@ export default {
                         },
                     },
                     {
-                        label: 'Start',
-                        field: 'start_time',
+                        label: 'Date',
+                        field: 'date',
                         sortable: false,
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter Start Time',
+                            placeholder: 'Filter Date',
+                        },
+                    },
+                    
+                    {
+                        label: 'Type',
+                        field: 'type',
+                        filterOptions: {
+                            enabled: true,
+                            placeholder: 'Filter Type',
                         },
                     },
                     {
-                        label: 'End',
-                        field: 'end_time',
+                        label: 'Description',
+                        field: 'description',
                         filterOptions: {
                             enabled: true,
-                            placeholder: 'Filter End Time',
-                        },
-                    },
-                    {
-                        label: 'Break (min)',
-                        field: 'break_duration',
-                        filterOptions: {
-                            enabled: true,
-                            placeholder: 'Filter Break Minutes',
-                        },
-                    },
-                    {
-                        label: 'Overnight',
-                        field: 'is_overnight',
-                        filterOptions: {
-                            enabled: true,
-                            placeholder: 'Filter Overnight',
+                            placeholder: 'Filter Description',
                         },
                     },
                     // {
@@ -191,12 +180,12 @@ export default {
     // shifts(){
     //   return [];
     // },
-    shifts() { return this.$store.state.shift.datas; },
-    loading() { return this.$store.state.shift.loading; },
+    holidayCalendar() { return this.$store.state.holidayCalendar.datas; },
+    loading() { return this.$store.state.holidayCalendar.loading; },
 
   },
   mounted() {
-    this.$store.dispatch('shift/fetchAll');
+    this.$store.dispatch('holidayCalendar/fetchAll');
   },
   // async created() {
   //     this.$store.commit("SET_LOADING", true);
@@ -212,13 +201,19 @@ export default {
         this.selectedData = row
         this.isSidebarOpen = true
     },
+    previewDay(date) {
+      if (!date) return '';
+      return new Date(date).toLocaleDateString('id-ID', {
+        weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+      });
+    },
 
     onDelete(id){
         const formData = new FormData()
         formData.append('id', id)
         this.$store.commit("SET_LOADING", true)
 
-        this.$store.dispatch("shift/remove", { formData, id }).then(() => {
+        this.$store.dispatch("holidayCalendar/remove", { formData, id }).then(() => {
         toast.success(
             `Data has been deleted`,
             {

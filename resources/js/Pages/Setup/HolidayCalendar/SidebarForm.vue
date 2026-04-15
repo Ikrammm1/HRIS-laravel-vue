@@ -132,7 +132,10 @@ export default {
       immediate: true,
       handler(val) {
         if (this.action === 'update' && val) {
-          this.form = { ...val };
+          this.form = {
+            ...val,
+            date: val.date ? val.date.substring(0, 10) : ''
+          };
         } else {
           this.form = this.defaultForm();
         }
@@ -151,27 +154,40 @@ export default {
       this.$emit('close');
       this.resetForm();
     },
-    async submitForm() {
+     submitForm() {
       Object.keys(this.touched).forEach(k => (this.touched[k] = true));
       if (!this.isFormValid) return;
 
-      try {
         this.$store.commit('SET_LOADING', true);
-        await this.$store.dispatch('holidayCalendar/process', {
+         this.$store.dispatch('holidayCalendar/process', {
           formData: this.form,
           id: this.action === 'update' ? this.form.id : null,
+        }).then(() => {
+          console.log('Shift saved successfully');
+          toast.success(
+            `Data has been ${this.action === 'update' ? 'updated' : 'added'}`,
+            {
+              position: 'bottom-center',
+              autoClose: 2000,
+            }
+          )
+
+          this.closeSidebar()
+          this.$store.commit("SET_LOADING", false)
+        }).catch((err) => {
+          console.error('Error saving item:', err)
+
+          toast.error(
+            err?.response?.data?.message || 'Something went wrong',
+            {
+              position: 'bottom-center',
+              autoClose: 2000,
+            }
+          )
+
+          this.closeSidebar()
+          this.$store.commit("SET_LOADING", false)
         });
-        toast.success(`Holiday berhasil ${this.action === 'add' ? 'ditambahkan' : 'diupdate'}`, {
-          position: 'bottom-center', autoClose: 2000,
-        });
-        this.closeSidebar();
-      } catch (err) {
-        toast.error(err?.response?.data?.message || 'Something went wrong', {
-          position: 'bottom-center', autoClose: 2000,
-        });
-      } finally {
-        this.$store.commit('SET_LOADING', false);
-      }
     },
   },
 };

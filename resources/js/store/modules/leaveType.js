@@ -25,22 +25,22 @@ export default {
   actions: {
     async fetchAll({ commit }) {
       commit('SET_LOADING', true);
-      const res = await axios.get('/api/setup/leave-types');
+      const res = await axios.get('/api/setup/leave-types/list');
       commit('SET_DATAS', res.data.data);
       commit('SET_LOADING', false);
     },
     async process({ commit }, { formData, id }) {
       if (id) {
-        const res = await axios.put(`/api/setup/leave-types/${id}`, formData);
+        const res = await axios.post(`/api/setup/leave-types/update/${id}`, formData);
         commit('UPDATE_DATA', res.data.data);
       } else {
-        const res = await axios.post('/api/setup/leave-types', formData);
+        const res = await axios.post('/api/setup/leave-types/add', formData);
         commit('ADD_DATA', res.data.data);
       }
     },
-    async remove({ commit }, id) {
-      await axios.delete(`/api/setup/leave-types/${id}`);
-      commit('DELETE_DATA', id);
+    async remove({ commit }, data) {
+      await axios.delete(`/api/setup/leave-types/delete/${data.id}`);
+      commit('DELETE_DATA', data.id);
     },
   },
 };

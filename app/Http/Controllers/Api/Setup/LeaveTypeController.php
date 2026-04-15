@@ -20,7 +20,7 @@ class LeaveTypeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code'            => 'required|unique:leave_types,code',
+            'code'            => 'required|unique:hris_leave_types,code',
             'name'            => 'required',
             'max_days'        => 'required|integer|min:1',
             'gender_specific' => 'required|in:all,male,female',
@@ -63,7 +63,7 @@ class LeaveTypeController extends Controller
         $leaveType = LeaveType::findOrFail($id);
 
         $request->validate([
-            'code'            => 'required|unique:leave_types,code,' . $id,
+            'code'            => 'required|unique:hris_leave_types,code,' . $id,
             'name'            => 'required',
             'max_days'        => 'required|integer|min:1',
             'gender_specific' => 'required|in:all,male,female',
